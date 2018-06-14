@@ -87,7 +87,7 @@ page gameFormat =
        do head_ $
             do meta_ [charset_ "UTF-8"]
                meta_ [name_ "viewport", content_ "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"]
-               link_ [rel_ "stylesheet", href_ "carp_style.css"]
+               link_ [rel_ "stylesheet", href_ "style.css"]
           body_ $
             do h1_ (toHtml (Text.pack gameFormat))
 
