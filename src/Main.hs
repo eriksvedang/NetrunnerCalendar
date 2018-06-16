@@ -8,8 +8,17 @@ import Lucid
 import qualified Data.Text.Lazy as T
 import qualified Data.Text.Lazy.Encoding as E
 import qualified Data.Text as Text
+import qualified Data.Set as Set
 
-sets = ["Original Core Set",
+deluxe = ["Creation and Control"
+         ,"Honor and Profit"
+         ,"Data and Destiny"
+         ,"Order and Chaos"
+         ,"Democracy and Dogma"
+         ]
+
+pack = ["Original Core Set",
+
         "Genesis",
         "What Lies Ahead",
         "Trace Amount",
@@ -17,15 +26,15 @@ sets = ["Original Core Set",
         "A Study in Static",
         "Humanity's Shadow",
         "Future Proof",
-        "Creation and Control",
+
         "Spin",
         "Opening Moves",
         "Second Thoughts",
         "Mala Tempora",
         "True Colors",
-        "Fear and Loathing",
         "Double Time",
-        "Honor and Profit",
+        "Fear and Loathing",
+
         "Lunar",
         "Upstalk",
         "The Spaces Between",
@@ -33,7 +42,7 @@ sets = ["Original Core Set",
         "Up and Over",
         "All That Remains",
         "The Source",
-        "Order and Chaos",
+
         "SanSan",
         "The Valley",
         "Breaker Bay",
@@ -41,20 +50,21 @@ sets = ["Original Core Set",
         "The Underway",
         "Old Hollywood",
         "The Universe of Tomorrow",
-        "Data and Destiny",
+
         "Mumbad",
         "Kala Ghoda",
         "Business First",
-        "Democracy and Dogma",
         "Salsette Island",
         "The Liberated Mind",
         "Fear the Masses",
+
         "Flashpoint",
         "23 Seconds",
         "Blood Money",
         "Escalation",
         "Intervention",
         "Martial Law",
+
         "Quorum",
         "Red Sand",
         "Daedalus Complex",
@@ -66,34 +76,40 @@ sets = ["Original Core Set",
         "Terminal Directive",
         "Revised Core Set",
         "Kitara",
+
         "Sovereign Sight",
         "Down the White Nile",
         "Council of the Crest",
         "The Devil and the Dragon",
         "Whispers in Nalubaale",
         "Kampala Ascendent"
-        -- "Reign and Reverie"
+
+        --"Reign and Reverie"
        ]
 
 combinations =
-  do a <- sets
-     b <- sets
-     c <- sets
-     return (a, b, c)
+  do a <- deluxe
+     b <- pack
+     c <- pack
+     return (Set.fromList [a, b, c])
 
-page :: String -> Html ()
-page gameFormat =
+uniqueCombinations =
+  Set.toList (Set.fromList combinations)
+
+page :: [Set.Set String] -> Html ()
+page gameFormats =
   do html_ $
        do head_ $
             do meta_ [charset_ "UTF-8"]
                meta_ [name_ "viewport", content_ "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"]
                link_ [rel_ "stylesheet", href_ "style.css"]
           body_ $
-            do h1_ (toHtml (Text.pack gameFormat))
+            do mapM_ (\format -> (p_ (toHtml (show (Set.toList format))))) gameFormats
 
 main :: IO ()
 main = do
   gen <- newStdGen
-  let shuffled = shuffle' combinations (length combinations) gen
-      gameFormat = (show (head shuffled))
+  let shuffled = shuffle' uniqueCombinations (length uniqueCombinations) gen
+      gameFormat = shuffled
+  putStrLn ("Total count: " ++ show (length shuffled))
   writeFile "index.html" (T.unpack (renderText (page gameFormat)))
