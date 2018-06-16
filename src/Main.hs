@@ -17,9 +17,10 @@ deluxe = ["Creation and Control"
          ,"Democracy and Dogma"
          ]
 
+cycles = ["Genesis","Spin","Lunar","SanSan","Mumbad","Flashpoint","Red Sand","Kitara","Original Core Set","Terminal Directive"]
+
 pack = ["Original Core Set",
 
-        "Genesis",
         "What Lies Ahead",
         "Trace Amount",
         "Cyber Exodus",
@@ -27,7 +28,6 @@ pack = ["Original Core Set",
         "Humanity's Shadow",
         "Future Proof",
 
-        "Spin",
         "Opening Moves",
         "Second Thoughts",
         "Mala Tempora",
@@ -35,7 +35,6 @@ pack = ["Original Core Set",
         "Double Time",
         "Fear and Loathing",
 
-        "Lunar",
         "Upstalk",
         "The Spaces Between",
         "First Contact",
@@ -43,7 +42,6 @@ pack = ["Original Core Set",
         "All That Remains",
         "The Source",
 
-        "SanSan",
         "The Valley",
         "Breaker Bay",
         "Chrome City",
@@ -51,31 +49,26 @@ pack = ["Original Core Set",
         "Old Hollywood",
         "The Universe of Tomorrow",
 
-        "Mumbad",
         "Kala Ghoda",
         "Business First",
         "Salsette Island",
         "The Liberated Mind",
         "Fear the Masses",
+        "Democracy and Dogma",
 
-        "Flashpoint",
         "23 Seconds",
         "Blood Money",
         "Escalation",
         "Intervention",
         "Martial Law",
-
         "Quorum",
-        "Red Sand",
+
         "Daedalus Complex",
         "Station One",
         "Earth's Scion",
         "Blood and Water",
         "Free Mars",
         "Crimson Dust",
-        "Terminal Directive",
-        "Revised Core Set",
-        "Kitara",
 
         "Sovereign Sight",
         "Down the White Nile",
@@ -89,7 +82,7 @@ pack = ["Original Core Set",
 
 combinations =
   do a <- deluxe
-     b <- pack
+     b <- cycles
      c <- pack
      return (Set.fromList [a, b, c])
 
