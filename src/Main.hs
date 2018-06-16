@@ -19,75 +19,80 @@ deluxe = ["Creation and Control"
 
 cycles = ["Genesis","Spin","Lunar","SanSan","Mumbad","Flashpoint","Red Sand","Kitara","Original Core Set","Terminal Directive"]
 
-pack = ["Original Core Set",
+packs = ["Original Core Set",
 
-        "What Lies Ahead",
-        "Trace Amount",
-        "Cyber Exodus",
-        "A Study in Static",
-        "Humanity's Shadow",
-        "Future Proof",
+         "What Lies Ahead",
+         "Trace Amount",
+         "Cyber Exodus",
+         "A Study in Static",
+         "Humanity's Shadow",
+         "Future Proof",
 
-        "Opening Moves",
-        "Second Thoughts",
-        "Mala Tempora",
-        "True Colors",
-        "Double Time",
-        "Fear and Loathing",
+         "Opening Moves",
+         "Second Thoughts",
+         "Mala Tempora",
+         "True Colors",
+         "Double Time",
+         "Fear and Loathing",
 
-        "Upstalk",
-        "The Spaces Between",
-        "First Contact",
-        "Up and Over",
-        "All That Remains",
-        "The Source",
+         "Upstalk",
+         "The Spaces Between",
+         "First Contact",
+         "Up and Over",
+         "All That Remains",
+         "The Source",
 
-        "The Valley",
-        "Breaker Bay",
-        "Chrome City",
-        "The Underway",
-        "Old Hollywood",
-        "The Universe of Tomorrow",
+         "The Valley",
+         "Breaker Bay",
+         "Chrome City",
+         "The Underway",
+         "Old Hollywood",
+         "The Universe of Tomorrow",
 
-        "Kala Ghoda",
-        "Business First",
-        "Salsette Island",
-        "The Liberated Mind",
-        "Fear the Masses",
-        "Democracy and Dogma",
+         "Kala Ghoda",
+         "Business First",
+         "Salsette Island",
+         "The Liberated Mind",
+         "Fear the Masses",
+         "Democracy and Dogma",
 
-        "23 Seconds",
-        "Blood Money",
-        "Escalation",
-        "Intervention",
-        "Martial Law",
-        "Quorum",
+         "23 Seconds",
+         "Blood Money",
+         "Escalation",
+         "Intervention",
+         "Martial Law",
+         "Quorum",
 
-        "Daedalus Complex",
-        "Station One",
-        "Earth's Scion",
-        "Blood and Water",
-        "Free Mars",
-        "Crimson Dust",
+         "Daedalus Complex",
+         "Station One",
+         "Earth's Scion",
+         "Blood and Water",
+         "Free Mars",
+         "Crimson Dust",
 
-        "Sovereign Sight",
-        "Down the White Nile",
-        "Council of the Crest",
-        "The Devil and the Dragon",
-        "Whispers in Nalubaale",
-        "Kampala Ascendent"
+         "Sovereign Sight",
+         "Down the White Nile",
+         "Council of the Crest",
+         "The Devil and the Dragon",
+         "Whispers in Nalubaale",
+         "Kampala Ascendent"
 
-        --"Reign and Reverie"
-       ]
+         --"Reign and Reverie"
+        ]
 
-combinations =
-  do a <- deluxe
-     b <- cycles
-     c <- pack
-     return (Set.fromList [a, b, c])
+-- combinations =
+--   do a <- deluxe
+--      b <- cycles
+--      c <- pack
+--      return (Set.fromList [a, b, c])
 
-uniqueCombinations =
-  Set.toList (Set.fromList combinations)
+-- uniqueCombinations =
+--   Set.toList (Set.fromList combinations)
+
+splitEvery _ [] = []
+splitEvery n list = first : (splitEvery n rest)
+  where
+    (first,rest) = splitAt n list
 
 page :: [Set.Set String] -> Html ()
 page gameFormats =
@@ -102,7 +107,8 @@ page gameFormats =
 main :: IO ()
 main = do
   gen <- newStdGen
-  let shuffled = shuffle' uniqueCombinations (length uniqueCombinations) gen
-      gameFormat = shuffled
+  let xs = deluxe ++ cycles
+      shuffled = shuffle' xs (length xs) gen
+      gameFormat = map (\xs -> (Set.fromList xs)) (splitEvery 3 shuffled)
   putStrLn ("Total count: " ++ show (length shuffled))
   writeFile "index.html" (T.unpack (renderText (page gameFormat)))
