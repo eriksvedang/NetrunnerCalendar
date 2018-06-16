@@ -15,9 +15,63 @@ deluxe = ["Creation and Control"
          ,"Data and Destiny"
          ,"Order and Chaos"
          ,"Democracy and Dogma"
+         ,"Reign and Reverie"
          ]
 
 cycles = ["Genesis","Spin","Lunar","SanSan","Mumbad","Flashpoint","Red Sand","Kitara","Original Core Set","Terminal Directive"]
+
+cycleOfPack pack =
+  case pack of
+    "What Lies Ahead" -> "Genesis"
+    "Trace Amount" -> "Genesis"
+    "Cyber Exodus" -> "Genesis"
+    "A Study in Static" -> "Genesis"
+    "Humanity's Shadow" -> "Genesis"
+    "Future Proof" -> "Genesis"
+    "Opening Moves" -> "Spin"
+    "Second Thoughts" -> "Spin"
+    "Mala Tempora" -> "Spin"
+    "True Colors" -> "Spin"
+    "Double Time" -> "Spin"
+    "Fear and Loathing" -> "Spin"
+    "Upstalk" -> "Lunar"
+    "The Spaces Between" -> "Lunar"
+    "First Contact" -> "Lunar"
+    "Up and Over" -> "Lunar"
+    "All That Remains" -> "Lunar"
+    "The Source" -> "Lunar"
+    "The Valley" -> "SanSan"
+    "Breaker Bay" -> "SanSan"
+    "Chrome City" -> "SanSan"
+    "The Underway" -> "SanSan"
+    "Old Hollywood" -> "SanSan"
+    "The Universe of Tomorrow" -> "SanSan"
+    "Kala Ghoda" -> "Mumbad"
+    "Business First" -> "Mumbad"
+    "Salsette Island" -> "Mumbad"
+    "The Liberated Mind" -> "Mumbad"
+    "Fear the Masses" -> "Mumbad"
+    "Democracy and Dogma" -> "Mumbad"
+    "23 Seconds" -> "Flashpoint"
+    "Blood Money" -> "Flashpoint"
+    "Escalation" -> "Flashpoint"
+    "Intervention" -> "Flashpoint"
+    "Martial Law" -> "Flashpoint"
+    "Quorum" -> "Flashpoint"
+    "Daedalus Complex" -> "Red Sand"
+    "Station One" -> "Red Sand"
+    "Earth's Scion" -> "Red Sand"
+    "Blood and Water" -> "Red Sand"
+    "Free Mars" -> "Red Sand"
+    "Crimson Dust" -> "Red Sand"
+    "Sovereign Sight" -> "Kitara"
+    "Down the White Nile" -> "Kitara"
+    "Council of the Crest" -> "Kitara"
+    "The Devil and the Dragon" -> "Kitara"
+    "Whispers in Nalubaale" -> "Kitara"
+    "Kampala Ascendent" -> "Kitara"
+    "Original Core Set" -> ""
+    missing -> error missing
 
 packs = ["Original Core Set",
 
@@ -76,25 +130,27 @@ packs = ["Original Core Set",
          "The Devil and the Dragon",
          "Whispers in Nalubaale",
          "Kampala Ascendent"
-
-         --"Reign and Reverie"
         ]
 
--- combinations =
---   do a <- deluxe
---      b <- cycles
---      c <- pack
---      return (Set.fromList [a, b, c])
+combinations =
+  do a <- deluxe
+     c <- packs
+     b <- (removeItem (cycleOfPack c) cycles) -- Prevent choosing the same cycle that the pack is in
+     return (Set.fromList [a, b, c])
 
--- uniqueCombinations =
---   Set.toList (Set.fromList combinations)
+uniqueCombinations =
+  Set.toList (Set.fromList combinations)
 
 splitEvery _ [] = []
 splitEvery n list = first : (splitEvery n rest)
   where
     (first,rest) = splitAt n list
 
-page :: [Set.Set String] -> Html ()
+removeItem _ []                 = []
+removeItem x (y:ys) | x == y    = removeItem x ys
+                    | otherwise = y : removeItem x ys
+
+page :: [(String, Set.Set String)] -> Html ()
 page gameFormats =
   do html_ $
        do head_ $
@@ -102,13 +158,21 @@ page gameFormats =
                meta_ [name_ "viewport", content_ "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"]
                link_ [rel_ "stylesheet", href_ "style.css"]
           body_ $
-            do mapM_ (\format -> (p_ (toHtml (show (Set.toList format))))) gameFormats
+            do mapM_ (\(date, format) -> (p_ (toHtml (date ++ ": " ++ (show (Set.toList format)))))) gameFormats
+
+dates = do
+  year <- [2018..]
+  month <- [1..]
+  day <- [1..31]
+  return (show year ++ "-" ++ show month ++ "-" ++ show day)
 
 main :: IO ()
 main = do
   gen <- newStdGen
-  let xs = deluxe ++ cycles
+  let --xs = deluxe ++ cycles
+      xs = uniqueCombinations
       shuffled = shuffle' xs (length xs) gen
-      gameFormat = map (\xs -> (Set.fromList xs)) (splitEvery 3 shuffled)
-  putStrLn ("Total count: " ++ show (length shuffled))
+      --gameFormat = map (\xs -> (Set.fromList xs)) (splitEvery 3 shuffled)
+      gameFormat = zip dates shuffled
+  putStrLn ("Total count: " ++ show (length gameFormat))
   writeFile "index.html" (T.unpack (renderText (page gameFormat)))
